@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+
+{% block title %}API Documentation{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="my-4">Webhook Application Documentation</h1>
+        
+        <p class="lead">This documentation provides an overview of the endpoints, request structure, and responses for the webhook system.</p>
+
+        <h2 class="my-4">1. Endpoints</h2>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <strong>POST /webhook/</strong> - Endpoint to receive trade requests.
+            </li>
+            <li class="list-group-item">
+                <strong>GET /requests/</strong> - View all received POST requests.
+            </li>
+            <li class="list-group-item">
+                <strong>GET /admin/</strong> - Admin interface to manage requests and system settings.
+            </li>
+        </ul>
+
+        <h2 class="my-4">2. How to Send a Webhook</h2>
+        <p>To send a POST request to the <code>/webhook/</code> endpoint, use the following structure in JSON format:</p>
+        <pre><code>
+        {
+            "stratName": "Your strategy name",
+            "alert": "Your alert message",
+            "exchange": "The exchange (e.g., CME_MINI)",
+            "symbol": "The trading symbol (e.g., NQU4)",
+            "price": 15000.00,
+            "direction": "BUY",
+            "secmgs": "your_secret_message"
+        }
+        </code></pre>
+
+        <p>Each field in the JSON payload has a specific meaning:</p>
+        <ul class="list-group mb-4">
+            <li class="list-group-item"><strong>stratName</strong>: The name of the strategy this trade belongs to.</li>
+            <li class="list-group-item"><strong>alert</strong>: The alert or message associated with the trade.</li>
+            <li class="list-group-item"><strong>exchange</strong>: The exchange where the trade will be placed (e.g., <code>CME_MINI</code>).</li>
+            <li class="list-group-item"><strong>symbol</strong>: The trading symbol of the asset (e.g., <code>NQU4</code> for NASDAQ Futures).</li>
+            <li class="list-group-item"><strong>price</strong>: The price at which the asset is being traded. Must be a decimal value.</li>
+            <li class="list-group-item"><strong>direction</strong>: The direction of the trade. It can be either <code>BUY</code> or <code>SELL</code>.</li>
+            <li class="list-group-item"><strong>secmgs</strong>: A secret message used for authentication. Ensure this matches your predefined secret.</li>
+        </ul>
+
+        <h2 class="my-4">3. Example Webhook Using cURL</h2>
+        <p>You can send a webhook using <code>curl</code> from the command line as follows:</p>
+        <pre><code>
+        curl -X POST http://127.0.0.1:8000/webhook/ \
+        -H "Content-Type: application/json" \
+        -d '{
+            "stratName": "Strat Alpha",
+            "alert": "Trade Alert!",
+            "exchange": "CME_MINI",
+            "symbol": "NQU4",
+            "price": 15000.50,
+            "direction": "BUY",
+            "secmgs": "your_secret_message"
+        }'
+        </code></pre>
+
+        <h2 class="my-4">4. Response</h2>
+        <p>After sending a POST request, the server will respond with a JSON object indicating whether the request was processed successfully or if there was an error.</p>
+
+        <h3 class="my-3">Successful Response</h3>
+        <pre><code>
+        {
+            "status": "Order received and processed"
+        }
+        </code></pre>
+
+        <h3 class="my-3">Error Response (Example)</h3>
+        <pre><code>
+        {
+            "error": "Invalid input: ['“frhhm” value must be a decimal number.']"
+        }
+        </code></pre>
+
+        <h2 class="my-4">5. Handling Errors</h2>
+        <p>If a webhook request contains invalid data (e.g., non-decimal price values or missing required fields), the server will respond with a <code>400</code> error and a message explaining the issue.</p>
+
+        <h2 class="my-4">6. Security</h2>
+        <p>To ensure that only valid webhooks are processed, always include the <code>secmgs</code> field in your request, which acts as a secret key for authentication.</p>
+    </div>
+{% endblock %}

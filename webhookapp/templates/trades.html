@@ -1,0 +1,120 @@
+{% extends 'layout.html' %}
+{% block title %}Recent Trades{% endblock %}
+{% block content %}
+ <!-- Custom styling for full-width tables and smaller font size -->
+<style>
+    .table-responsive {width: 100%;}
+    .table {font-size: 12px;}
+    .consolidated-table {width: 40%;}
+    .recent-trades-table {width: 60%;}
+</style>
+    <h1 class="my-4">Trades Overview</h1>
+    
+    <!-- Bootstrap grid to place two tables side by side -->
+    <div class="row">
+        <!-- Consolidated Trades Table -->
+        <div class="col-md-4 consolidated-table">
+            <h2>Consolidated Trades</h2>
+            <button id="refresh-btn" class="btn btn-primary mb-3">Refresh Trades</button>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Symbol</th>
+                            <th>Average Price</th>
+                            <th>Cumulative Quantity</th>
+                            <th>Direction</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trade in consolidated_trades %}
+                        <tr>
+                            <td>{{ trade.orderId }}</td>
+                            <td>{{ trade.symbol }}</td>
+                            <td>{{ trade.avgPrice }}</td>
+                            <td>{{ trade.cumQuantity }}</td>
+                            <td>{{ trade.direction }}</td>
+                            <td>{{ trade.timestamp|cut:" Europe/Paris" }}</td> <!-- Remove timezone -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Trades Table -->
+        <div class="col-md-8 recent-trades-table">
+            <h2>Recent Trades</h2>
+            <button id="refresh-btn" class="btn btn-primary mb-3">Refresh Trades</button>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Order ID</th>
+                            <th>Symbol</th>
+                            <th>Price</th>
+                            <th>Average Price</th>
+                            <th>Quantity</th>
+                            <th>Cumulative Quantity</th>
+                            <th>Direction</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trade in trades %}
+                        <tr>
+                            <td>{{ trade.id }}</td>
+                            <td>{{ trade.orderId }}</td>
+                            <td>{{ trade.symbol }}</td>
+                            <td>{{ trade.price }}</td>
+                            <td>{{ trade.avgPrice }}</td>
+                            <td>{{ trade.quantity }}</td>
+                            <td>{{ trade.cumQuantity }}</td>
+                            <td>{{ trade.direction }}</td>
+                            <td>{{ trade.timestamp|cut:" Europe/Paris" }}</td> <!-- Remove timezone -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.getElementById('refresh-btn').addEventListener('click', function() {
+            fetch('{% url "refresh_trades" %}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Clear the table body
+                        const tbody = document.querySelector('#trades-list tbody');
+                        tbody.innerHTML = '';
+
+                        // Populate the table with new data
+                        data.trades.forEach(trade => {
+                            const row = `
+                                <tr>
+                                    <td>${trade.id}</td>
+                                    <td>${trade.orderId}</td>
+                                    <td>${trade.symbol}</td>
+                                    <td>${trade.price}</td>
+                                    <td>${trade.avgPrice}</td>
+                                    <td>${trade.quantity}</td>
+                                    <td>${trade.cumQuantity}</td>
+                                    <td>${trade.direction}</td>
+                                    <td>${trade.timestamp}</td>
+                                </tr>`;
+                            tbody.innerHTML += row;
+                        });
+                    } else {
+                        alert('Error refreshing trades: ' + data.message);
+                    }
+                });
+        });
+    </script>
+{% endblock %}

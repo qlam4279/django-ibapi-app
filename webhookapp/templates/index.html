@@ -1,0 +1,52 @@
+{% extends 'layout.html' %}
+
+{% block title %}Home - Webhook Application{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Welcome to the Webhook Application</h1>
+    <p class="lead">This is the dashboard for managing and monitoring incoming webhooks and trade requests.</p>
+
+    <h2 class="my-4">Recent Webhook Activity</h2>
+
+    <!-- Add Bootstrap table class for better styling -->
+    <div class="table-responsive">
+        <table id="indextable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Symbol</th>
+                    <th>Price</th>
+                    <th>Direction</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in recent_requests %}
+                <tr>
+                    <td>{{ req.timestamp }}</td>
+                    <td>{{ req.symbol }}</td>
+                    <td>{{ req.price }}</td>
+                    <td>{{ req.direction }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="my-4">How to Send a Webhook</h2>
+    <p>Send a POST request to <code>/webhook/</code> with the following JSON structure:</p>
+    <pre>
+    {
+        "stratName": "Your strategy name",
+        "alert": "Your alert message",
+        "exchange": "The exchange (e.g., CME_MINI)",
+        "symbol": "The trading symbol (e.g., NQU4)",
+        "price": "Price of the asset",
+        "direction": "Direction of the trade (BUY/SELL)",
+        "secmgs": "Your secret message for authentication"
+    }
+    </pre>
+
+    <!-- Optional: Add System Status section -->
+    <!-- <h2>System Status</h2>
+    <p>IBAPI Connection: <span class="text-success">Connected</span></p> -->
+{% endblock %}

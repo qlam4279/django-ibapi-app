@@ -1,0 +1,15 @@
+*.pyc
+__pycache__/
+db.sqlite3
+/media/
+*.log
+*.pot
+*.py[cod]
+*.swp
+.env
+*.sqlite3
+.DS_Store
+/venv/
+/staticfiles/
+/node_modules/
+ibapp/settings.py
